@@ -1,0 +1,12 @@
+{
+  "name": "onefold-js",
+  "main": "dist/onefold.js",
+  "description": "Tiny library providing only essential APIs missing from the ECMAScript language runtime.",
+  "authors": ["Ben Schulz (https://github.com/benschulz)"],
+  "license": "BSD-3-Clause",
+  "keywords": ["util"],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/benschulz/onefold-js.git"
+  }
+}
