@@ -19,7 +19,9 @@ define(['./arrays', './functions', './objects', './strings'], function (arrays, 
         'objects': {
             'areEqual': objects.areEqual,
             'extend': objects.extend,
-            'hasOwn': objects.hasOwn
+            'forEachProperty': objects.forEachProperty,
+            'hasOwn': objects.hasOwn,
+            'mapProperties': objects.mapProperties
         },
         'strings': {
             'convertCamelToHyphenCase': strings.convertCamelToHyphenCase,
