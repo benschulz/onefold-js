@@ -4,7 +4,10 @@ define(['./arrays', './functions', './objects', './strings'], function (arrays, 
     return {
         'arrays': {
             'contains': arrays.contains,
+            'distinct': arrays.distinct,
             'flatMap': arrays.flatMap,
+            'single': arrays.single,
+            'singleOrNull': arrays.singleOrNull,
             'stableSort': arrays.stableSort
         },
         'functions': {
