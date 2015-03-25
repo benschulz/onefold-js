@@ -1,9 +1,9 @@
 'use strict';
 
-define(['./stable-sort'], function () {
+define(['./constant.test', './identity.test'], function () {
     var tests = arguments;
 
-    describe('arrays', function () {
+    describe('functions', function () {
         Array.prototype.slice.call(tests).forEach(function (test) {
             test();
         });
