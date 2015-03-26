@@ -8,9 +8,129 @@
     else
         window['onefold-js'] = factory();
 } (function() {
-var onefold_js_arrays, onefold_js_functions, onefold_js_objects, onefold_js_strings, onefold_js_onefold, onefold_js;
+var onefold_js_objects, onefold_js_arrays, onefold_js_functions, onefold_js_strings, onefold_js_onefold, onefold_js;
 
-onefold_js_arrays = function () {
+onefold_js_objects = function () {
+  return {
+    areEqual: areEqual,
+    extend: extend,
+    forEachProperty: forEachProperty,
+    hasOwn: hasOwn,
+    mapProperties: mapProperties
+  };
+  function areEqual(a, b) {
+    if (a === b)
+      return true;
+    var aHasValue = !!a && typeof a.valueOf === 'function';
+    var bHasValue = !!b && typeof b.valueOf === 'function';
+    return aHasValue && bHasValue && a.valueOf() === b.valueOf();
+  }
+  function extend(object, extensions) {
+    Array.prototype.slice.call(arguments, 1).forEach(function (source) {
+      var keys = Object.keys(source);
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i];
+        var descriptor = Object.getOwnPropertyDescriptor(source, key);
+        if (descriptor !== undefined && descriptor.enumerable)
+          Object.defineProperty(object, key, descriptor);
+      }
+    });
+    return object;
+  }
+  function forEachProperty(owner, action) {
+    for (var propertyName in owner)
+      if (hasOwn(owner, propertyName))
+        action(propertyName, owner[propertyName]);
+  }
+  function hasOwn(owner, propertyName) {
+    return Object.prototype.hasOwnProperty.call(owner, propertyName);
+  }
+  function mapProperties(source, mapper) {
+    var destination = {};
+    for (var propertyName in source)
+      if (hasOwn(source, propertyName))
+        destination[propertyName] = mapper(source[propertyName], propertyName, source);
+    return destination;
+  }
+}();
+
+onefold_js_arrays = function (objects) {
+  return {
+    contains: contains,
+    distinct: distinct,
+    flatMap: flatMap,
+    single: single,
+    singleOrNull: singleOrNull,
+    stableSort: stableSortInPlace
+  };
+  function contains(array, value) {
+    return array.indexOf(value) >= 0;
+  }
+  function distinct(array) {
+    return array.length > 50 ? distinctForLargeArrays(array) : distinctForSmallArrays(array);
+  }
+  function distinctForSmallArrays(array) {
+    return array.filter(function (e, i, a) {
+      return a.lastIndexOf(e) === i;
+    });
+  }
+  function distinctForLargeArrays(source) {
+    var length = source.length, stringLookup = {}, value;
+    for (var i = 0; i < length; ++i) {
+      value = source[i];
+      if (typeof value === 'string') {
+        if (objects.hasOwn(stringLookup, value))
+          break;
+        else
+          stringLookup[value] = true;
+      } else if (source.lastIndexOf(value) !== i) {
+        break;
+      }
+    }
+    if (i >= length)
+      return source;
+    var destination = source.slice(0, i);
+    for (; i < length; ++i) {
+      value = source[i];
+      if (typeof value === 'string') {
+        if (!objects.hasOwn(stringLookup, value)) {
+          stringLookup[value] = true;
+          destination.push(value);
+        }
+      } else if (source.lastIndexOf(value) === i) {
+        destination.push(value);
+      }
+    }
+    return destination;
+  }
+  function flatMap(array, mapper) {
+    return Array.prototype.concat.apply([], array.map(mapper));
+  }
+  function single(array, predicate) {
+    var index = trySingleIndex(array, predicate);
+    if (index < 0)
+      throw new Error('None of the elements matches the predicate.');
+    return array[index];
+  }
+  function singleOrNull(array, predicate) {
+    var index = trySingleIndex(array, predicate);
+    return index >= 0 ? array[index] : null;
+  }
+  function trySingleIndex(array, predicate) {
+    var length = array.length, matchIndex = -1;
+    for (var i = 0; i < length; ++i) {
+      var element = array[i];
+      if (predicate(element)) {
+        if (matchIndex >= 0)
+          throw new Error('Multiple elements match the predicate.');
+        matchIndex = i;
+      }
+    }
+    return matchIndex;
+  }
+  function stableSortInPlace(array, comparator) {
+    return stableSort(array, comparator || naturalComparator, true);
+  }
   function naturalComparator(a, b) {
     return a && typeof a.valueOf === 'function' && b && typeof b.valueOf === 'function' ? a.valueOf() <= b.valueOf() ? a.valueOf() < b.valueOf() ? -1 : 0 : 1 : a <= b ? a < b ? -1 : 0 : 1;
   }
@@ -50,18 +170,7 @@ onefold_js_arrays = function () {
       destination[i] = source[indexes[i]];
     return destination;
   }
-  return {
-    contains: function (array, value) {
-      return array.indexOf(value) >= 0;
-    },
-    flatMap: function (array, mapping) {
-      return Array.prototype.concat.apply([], array.map(mapping));
-    },
-    stableSort: function (array, comparator) {
-      return stableSort(array, comparator || naturalComparator, true);
-    }
-  };
-}();
+}(onefold_js_objects);
 
 onefold_js_functions = function () {
   var constant = function (x) {
@@ -70,6 +179,7 @@ onefold_js_functions = function () {
     };
   };
   return {
+    // TODO with arrow functions these can go away
     true: constant(true),
     false: constant(false),
     nop: constant(undefined),
@@ -79,36 +189,6 @@ onefold_js_functions = function () {
     identity: function (x) {
       return x;
     }
-  };
-}();
-
-onefold_js_objects = function () {
-  function hasOwn(owner, propertyName) {
-    return Object.prototype.hasOwnProperty.call(owner, propertyName);
-  }
-  function forEachProperty(owner, action) {
-    for (var propertyName in owner)
-      if (hasOwn(owner, propertyName))
-        action(propertyName, owner[propertyName]);
-  }
-  return {
-    areEqual: function (a, b) {
-      return a === b || !!(a && typeof a.valueOf === 'function' && b && typeof b.valueOf === 'function' && a.valueOf() === b.valueOf());
-    },
-    extend: function (target) {
-      Array.prototype.slice.call(arguments, 1).forEach(function (source) {
-        var keys = Object.keys(source);
-        for (var i = 0, length = keys.length; i < length; i++) {
-          var key = keys[i];
-          var descriptor = Object.getOwnPropertyDescriptor(source, key);
-          if (descriptor !== undefined && descriptor.enumerable)
-            Object.defineProperty(target, key, descriptor);
-        }
-      });
-      return target;
-    },
-    forEachProperty: forEachProperty,
-    hasOwn: hasOwn
   };
 }();
 
@@ -136,7 +216,10 @@ onefold_js_onefold = function (arrays, functions, objects, strings) {
   return {
     'arrays': {
       'contains': arrays.contains,
+      'distinct': arrays.distinct,
       'flatMap': arrays.flatMap,
+      'single': arrays.single,
+      'singleOrNull': arrays.singleOrNull,
       'stableSort': arrays.stableSort
     },
     'functions': {
@@ -151,7 +234,9 @@ onefold_js_onefold = function (arrays, functions, objects, strings) {
     'objects': {
       'areEqual': objects.areEqual,
       'extend': objects.extend,
-      'hasOwn': objects.hasOwn
+      'forEachProperty': objects.forEachProperty,
+      'hasOwn': objects.hasOwn,
+      'mapProperties': objects.mapProperties
     },
     'strings': {
       'convertCamelToHyphenCase': strings.convertCamelToHyphenCase,
