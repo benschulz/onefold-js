@@ -1,1 +1,0 @@
-Tiny library providing only essential APIs missing from the ECMAScript language runtime.
