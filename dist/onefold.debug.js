@@ -8,7 +8,7 @@
     else
         window['onefold-js'] = factory();
 } (function() {
-var onefold_js_objects, onefold_js_arrays, onefold_js_functions, onefold_js_strings, onefold_js_onefold, onefold_js;
+var onefold_js_objects, onefold_js_arrays, onefold_js_strings, onefold_js_onefold, onefold_js;
 
 onefold_js_objects = function () {
   return {
@@ -172,26 +172,6 @@ onefold_js_arrays = function (objects) {
   }
 }(onefold_js_objects);
 
-onefold_js_functions = function () {
-  var constant = function (x) {
-    return function () {
-      return x;
-    };
-  };
-  return {
-    // TODO with arrow functions these can go away
-    true: constant(true),
-    false: constant(false),
-    nop: constant(undefined),
-    null: constant(null),
-    zero: constant(0),
-    constant: constant,
-    identity: function (x) {
-      return x;
-    }
-  };
-}();
-
 onefold_js_strings = {
   convertCamelToHyphenCase: function (camelCased) {
     return camelCased.replace(/([A-Z])/g, function (match) {
@@ -212,7 +192,7 @@ onefold_js_strings = {
   }
 };
 
-onefold_js_onefold = function (arrays, functions, objects, strings) {
+onefold_js_onefold = function (arrays, objects, strings) {
   return {
     'arrays': {
       'contains': arrays.contains,
@@ -221,15 +201,6 @@ onefold_js_onefold = function (arrays, functions, objects, strings) {
       'single': arrays.single,
       'singleOrNull': arrays.singleOrNull,
       'stableSort': arrays.stableSort
-    },
-    'functions': {
-      'constant': functions.constant,
-      'identity': functions.identity,
-      'nop': functions.nop,
-      'null': functions.null,
-      'true': functions.true,
-      'false': functions.false,
-      'zero': functions.zero
     },
     'objects': {
       'areEqual': objects.areEqual,
@@ -243,7 +214,7 @@ onefold_js_onefold = function (arrays, functions, objects, strings) {
       'convertHyphenToCamelCase': strings.convertHyphenToCamelCase
     }
   };
-}(onefold_js_arrays, onefold_js_functions, onefold_js_objects, onefold_js_strings);
+}(onefold_js_arrays, onefold_js_objects, onefold_js_strings);
 onefold_js = function (main) {
   return main;
 }(onefold_js_onefold);return onefold_js;

@@ -1,6 +1,6 @@
 'use strict';
 
-define(['./arrays', './functions', './objects', './strings'], function (arrays, functions, objects, strings) {
+define(['./arrays', './objects', './strings'], function (arrays, objects, strings) {
     return {
         'arrays': {
             'contains': arrays.contains,
@@ -9,15 +9,6 @@ define(['./arrays', './functions', './objects', './strings'], function (arrays, 
             'single': arrays.single,
             'singleOrNull': arrays.singleOrNull,
             'stableSort': arrays.stableSort
-        },
-        'functions': {
-            'constant': functions.constant,
-            'identity': functions.identity,
-            'nop': functions.nop,
-            'null': functions.null,
-            'true': functions.true,
-            'false': functions.false,
-            'zero': functions.zero
         },
         'objects': {
             'areEqual': objects.areEqual,

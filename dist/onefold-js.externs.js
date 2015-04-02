@@ -92,23 +92,6 @@ de.benshu.onefold.js.arrays.singleOrNull= function (array, predicate) {};
 de.benshu.onefold.js.arrays.stableSort = function (array, comparator) {};
 
 /** @namespace */
-de.benshu.onefold.js.functions = {};
-
-/**
- * @template T
- * @param {T} value
- * @returns {function():T}
- */
-de.benshu.onefold.js.functions.constant = function (value) { };
-
-/**
- * @template T
- * @param {T} value
- * @returns {T}
- */
-de.benshu.onefold.js.functions.identity = function (value) { };
-
-/** @namespace */
 de.benshu.onefold.js.strings = {};
 
 /**
